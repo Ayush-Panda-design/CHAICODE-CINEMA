@@ -13,7 +13,7 @@ const pool = new pg.Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 
-  // 🔥 REQUIRED for Render PostgreSQL
+  
   ssl: {
     rejectUnauthorized: false,
   },
