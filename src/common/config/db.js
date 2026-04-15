@@ -7,14 +7,19 @@ dotenv.config();
 // If you pick one connection out of the pool and release it,
 // the pooler will keep that connection open for sometime for other clients to reuse.
 const pool = new pg.Pool({
-  host: process.env.DB_HOST || "localhost",
-  port: Number(process.env.DB_PORT) || 5432,
-  user: process.env.DB_USER || "postgres",
-  password: process.env.DB_PASSWORD || "postgres",
-  database: process.env.DB_NAME || "cinema_db",
-  max: 20,
-  connectionTimeoutMillis: 0,
-  idleTimeoutMillis: 0,
-});
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 
+  // 🔥 REQUIRED for Render PostgreSQL
+  ssl: {
+    rejectUnauthorized: false,
+  },
+
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+});
 export default pool;
