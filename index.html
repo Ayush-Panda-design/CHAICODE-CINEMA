@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>ChaiCode Cinema – Book Your Seat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'DM Sans', sans-serif; }
+        body { 
+            background-color: #050505; 
+            color: #e5e5e5; 
+            background-image: radial-gradient(circle at 50% -20%, #1a1a1a 0%, #050505 80%);
+        }
+
+        /* NAV - Glass Effect */
+        .top-nav {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* PREMIUM SEAT STYLES */
+        .seat-available {
+            background: #121212;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .seat-available:hover {
+            background: #e11d48;
+            border-color: #fb1d4d;
+            color: #fff;
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(225, 29, 72, 0.4);
+        }
+        .seat-booked {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            color: #222;
+            cursor: not-allowed;
+        }
+
+        /* SCREEN WITH GLOW */
+        .screen-bar {
+            height: 6px;
+            background: linear-gradient(90deg, transparent, #fff, transparent);
+            border-radius: 100%;
+            box-shadow: 0 10px 40px 2px rgba(255, 255, 255, 0.2);
+            filter: blur(1px);
+        }
+
+        /* PREMIUM SIDE PANEL - Styled Order Summary */
+        .side-panel {
+            background: linear-gradient(145deg, rgba(20, 20, 20, 0.9), rgba(10, 10, 10, 0.9));
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .side-panel::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(225, 29, 72, 0.5), transparent);
+        }
+
+        /* MODAL GLASS */
+        .modal-box {
+            background: rgba(18, 18, 18, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+
+        /* BUTTONS */
+        .btn-primary {
+            background: #e11d48;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            letter-spacing: 0.025em;
+        }
+        .btn-primary:hover { 
+            background: #fb1d4d;
+            box-shadow: 0 8px 20px -4px rgba(225, 29, 72, 0.5);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #999;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+        .badge {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            padding: 3px 12px;
+            border-radius: 20px;
+            background: rgba(225, 29, 72, 0.15);
+            color: #f43f5e;
+            border: 1px solid rgba(225, 29, 72, 0.3);
+        }
+
+        /* Ticket Notch Effect */
+        .ticket-cut {
+            position: relative;
+        }
+        .ticket-cut::before, .ticket-cut::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #050505;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .ticket-cut::before { left: -8px; border-right: 1px solid rgba(255, 255, 255, 0.08); }
+        .ticket-cut::after { right: -8px; border-left: 1px solid rgba(255, 255, 255, 0.08); }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+<nav class="top-nav sticky top-0 z-50 px-8 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-red-600 flex items-center justify-center text-sm shadow-lg shadow-red-900/20">🎬</div>
+        <span class="font-bold text-white text-lg tracking-tight">ChaiCode <span class="text-red-500">Cinema</span></span>
+    </div>
+
+    <div class="flex items-center gap-6">
+        <div class="hidden sm:flex items-center gap-3 bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
+            <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+            <span id="userEmail" class="text-xs font-medium text-neutral-300"></span>
+        </div>
+        <button onclick="logout()" class="text-xs font-bold uppercase tracking-widest text-neutral-500 hover:text-white transition-colors">
+            Sign out
+        </button>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-6 md:px-12 py-12">
+
+    <div class="mb-12">
+       
+        <h1 class="text-3xl font-bold text-white tracking-tight">Select Your Seats</h1>
+        <p class="text-neutral-500 text-sm mt-2 flex items-center gap-3">
+            <span>Evening Show</span>
+            <span class="w-1 h-1 rounded-full bg-neutral-800"></span>
+            <span>Hall 1</span>
+            <span class="w-1 h-1 rounded-full bg-neutral-800"></span>
+            <span class="text-neutral-400">Dolby Atmos</span>
+        </p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-12 items-start">
+
+        <div class="flex-1 w-full">
+
+            <div class="mb-16 text-center relative">
+                <div class="screen-bar w-2/3 mx-auto mb-6"></div>
+                <p class="text-[10px] text-neutral-500 uppercase tracking-[0.5em] font-bold">Cinema Screen</p>
+            </div>
+
+            <div class="flex items-center gap-8 mb-10 justify-center">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-4 h-4 rounded-sm seat-available"></div>
+                    <span class="text-[11px] font-bold text-neutral-500 uppercase tracking-wider">Available</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-4 h-4 rounded-sm seat-booked"></div>
+                    <span class="text-[11px] font-bold text-neutral-500 uppercase tracking-wider">Booked</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-4 h-4 rounded-sm bg-red-500 shadow-sm shadow-red-500/50"></div>
+                    <span class="text-[11px] font-bold text-neutral-500 uppercase tracking-wider">Selected</span>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto pb-4">
+                <div class="bg-[#0c0c0c] border border-white/5 rounded-3xl p-10 min-w-[500px] shadow-inner">
+                    <div id="seatGrid" class="grid grid-cols-10 gap-4 justify-items-center"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:w-80 xl:w-96 w-full">
+            <div class="side-panel p-8 sticky top-28 shadow-2xl">
+                
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="font-bold text-white text-xl tracking-tight">Now Showing</h2>
+                    <span class="badge">HALL 1</span>
+                </div>
+
+                <div class="space-y-4 mb-8">
+                    <div class="flex items-center gap-4 group">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-lg">🎬</div>
+                        <div>
+                            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Movie</p>
+                            <p class="text-sm font-semibold text-white">Dhurandhar 2</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 group">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-lg">📅</div>
+                        <div>
+                            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Date & Time</p>
+                            <p class="text-sm font-semibold text-white">Today, 7:30 PM</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-lg">📍</div>
+                        <div>
+                            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Experience</p>
+                            <p class="text-sm font-semibold text-white">4K · Dolby Atmos</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ticket-cut h-px bg-white/5 mb-8 w-full"></div>
+
+                <div class="space-y-3 mb-10">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-neutral-400">Standard Ticket</span>
+                        <span class="text-sm font-bold text-white tracking-tight">₹199.00</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-neutral-400">Convenience Fee</span>
+                        <span class="text-xs font-bold text-green-500 uppercase tracking-tighter">No Charge</span>
+                    </div>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/5">
+                        <span class="text-base font-bold text-white">Total Amount</span>
+                        <span class="text-xl font-black text-red-500">₹199</span>
+                    </div>
+                </div>
+
+                <div class="bg-red-500/5 rounded-2xl p-6 border border-red-500/20 text-center relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <p class="text-[10px] font-bold text-red-400 uppercase tracking-[0.3em] mb-3">Your Selection</p>
+                    <div id="selectionHint" class="text-4xl font-black text-white drop-shadow-lg">💺</div>
+                    <p class="text-[9px] text-neutral-600 mt-4 uppercase font-bold tracking-widest">Click a seat on the map</p>
+                </div>
+
+                <p class="text-[9px] font-medium text-neutral-700 mt-8 leading-relaxed text-center uppercase tracking-widest">
+                    Secure Your Seat
+                </p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="bookingModal" class="fixed inset-0 hidden items-center justify-center bg-black/90 z-50 px-4 backdrop-blur-md">
+    <div class="modal-box w-full max-w-sm p-8 shadow-2xl">
+        <div class="mb-8">
+            <h2 id="modalTitle" class="text-2xl font-bold text-white tracking-tight">Checkout</h2>
+            <div id="modalStep" class="flex gap-1.5 mt-4">
+                <div id="step1dot" class="h-1 flex-1 rounded-full bg-red-500 transition-all duration-500"></div>
+                <div id="step2dot" class="h-1 flex-1 rounded-full bg-neutral-800 transition-all duration-500"></div>
+            </div>
+        </div>
+
+        <p id="modalText" class="text-sm text-neutral-400 mb-8 leading-relaxed"></p>
+
+        <div id="paymentInfo" class="hidden mb-8 bg-black/50 border border-white/5 rounded-2xl p-6">
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-xs font-bold text-neutral-500 uppercase tracking-widest">Seat Number</span>
+                <span id="paymentSeat" class="text-sm font-bold text-white"></span>
+            </div>
+            <div class="flex justify-between items-center mt-3 pt-3 border-t border-white/5">
+                <span class="text-xs font-bold text-neutral-500 uppercase tracking-widest">Final Price</span>
+                <span class="text-lg font-black text-white">₹199</span>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+            <button id="nextBtn" class="btn-primary w-full py-4 rounded-xl text-sm order-1 shadow-lg shadow-red-900/40">
+                Confirm & Proceed
+            </button>
+            <button onclick="closeModal()" class="btn-secondary w-full py-4 rounded-xl text-sm order-2">
+                Discard Selection
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login';
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    document.getElementById('userEmail').textContent = user.email;
+
+    let selectedSeat = null;
+    let step = 1;
+
+    const modal = document.getElementById('bookingModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalText = document.getElementById('modalText');
+    const nextBtn = document.getElementById('nextBtn');
+    const step1dot = document.getElementById('step1dot');
+    const step2dot = document.getElementById('step2dot');
+    const paymentInfo = document.getElementById('paymentInfo');
+
+    function openModal(seatId) {
+        selectedSeat = seatId;
+        step = 1;
+
+        modalTitle.textContent = "Reserve Seat";
+        modalText.textContent = `You are about to book Seat ${seatId}. This selection will be held for 10 minutes.`;
+        nextBtn.textContent = "Proceed to Pay";
+        step1dot.style.background = '#e11d48';
+        step2dot.style.background = '#2a2a2a';
+        paymentInfo.classList.add('hidden');
+
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+    }
+
+    function closeModal() {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        selectedSeat = null;
+        step = 1;
+    }
+
+    nextBtn.onclick = async () => {
+        if (step === 1) {
+            step = 2;
+            modalTitle.textContent = "Secure Payment";
+            modalText.textContent = "Confirming your seat reservation. Please do not refresh.";
+            nextBtn.textContent = "Pay ₹199 Now";
+            step1dot.style.background = '#e11d48';
+            step2dot.style.background = '#e11d48';
+            document.getElementById('paymentSeat').textContent = `${selectedSeat}`;
+            paymentInfo.classList.remove('hidden');
+            return;
+        }
+
+        if (step === 2) {
+            modalTitle.textContent = "Processing...";
+            nextBtn.disabled = true;
+            nextBtn.textContent = "Finalizing Booking...";
+            nextBtn.style.opacity = "0.5";
+
+            try {
+                const res = await fetch(`/booking/${selectedSeat}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                    paymentInfo.classList.add('hidden');
+                    modalTitle.textContent = "Success!";
+                    modalTitle.style.color = "#22c55e";
+                    modalText.textContent = `Seat ${selectedSeat} is now yours. We've sent the digital ticket to ${user.email}.`;
+                    nextBtn.disabled = false;
+                    nextBtn.style.opacity = "1";
+                    nextBtn.textContent = "View Tickets";
+                    nextBtn.style.background = "#22c55e";
+                    step1dot.style.background = "#22c55e";
+                    step2dot.style.background = "#22c55e";
+                    nextBtn.onclick = () => { closeModal(); fetchSeats(); nextBtn.style.background = ''; modalTitle.style.color = ''; };
+                } else {
+                    const err = await res.text();
+                    modalTitle.textContent = "Booking Error";
+                    modalTitle.style.color = "#e11d48";
+                    modalText.textContent = err || "This seat was just taken by someone else.";
+                    nextBtn.disabled = false;
+                    nextBtn.style.opacity = "1";
+                    nextBtn.textContent = "Try Another Seat";
+                    nextBtn.onclick = () => { closeModal(); modalTitle.style.color = ''; };
+                }
+            } catch (err) {
+                modalTitle.textContent = "Network Error";
+                modalTitle.style.color = "#e11d48";
+                modalText.textContent = "Connection lost. Please check your signal and retry.";
+                nextBtn.disabled = false;
+                nextBtn.style.opacity = "1";
+                nextBtn.textContent = "Retry";
+                nextBtn.onclick = () => { closeModal(); modalTitle.style.color = ''; };
+            }
+        }
+    };
+
+    async function fetchSeats() {
+        const res = await fetch('/seats');
+        const seats = await res.json();
+        const grid = document.getElementById('seatGrid');
+        grid.innerHTML = '';
+
+        seats.forEach(seat => {
+            const btn = document.createElement('button');
+            btn.className = "w-10 h-10 rounded-lg text-[11px] font-bold " + (seat.isbooked ? "seat-booked" : "seat-available");
+            if (!seat.isbooked) {
+                btn.onclick = () => openModal(seat.id);
+            } else {
+                btn.disabled = true;
+            }
+            btn.textContent = seat.id;
+            grid.appendChild(btn);
+        });
+    }
+
+    function logout() {
+        localStorage.clear();
+        window.location.href = '/login';
+    }
+
+    fetchSeats();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register – ChaiCode Cinema</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'DM Sans', sans-serif; }
+    body { background-color: #0a0a0a; }
+    .input-field {
+        background: #1a1a1a;
+        border: 1px solid #2a2a2a;
+        color: #f1f1f1;
+        transition: border-color 0.2s;
+    }
+    .input-field:focus {
+        outline: none;
+        border-color: #e11d48;
+        background: #1f1f1f;
+    }
+    .input-field::placeholder { color: #555; }
+    .btn-primary {
+        background: #e11d48;
+        color: white;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #be123c; }
+    .divider { border-color: #222; }
+    .strength-bar { height: 3px; border-radius: 2px; transition: width 0.3s, background 0.3s; }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col" style="background-color:#0a0a0a;">
+
+
+    <header class="border-b border-neutral-800 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded bg-red-600 flex items-center justify-center text-base">🎬</div>
+            <span class="font-bold text-white text-lg tracking-tight">ChaiCode <span class="text-red-500">Cinema</span></span>
+        </div>
+        <a href="/login" class="text-sm text-neutral-400 hover:text-white transition-colors">Already registered? Sign in →</a>
+    </header>
+
+
+    <main class="flex-1 flex items-center justify-center px-4 py-16">
+        <div class="w-full max-w-sm">
+
+            <div class="mb-8">
+                <h1 class="text-2xl font-bold text-white mb-1">Create account</h1>
+                <p class="text-neutral-500 text-sm">Join ChaiCode Cinema and start booking.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-2">Email</label>
+                    <input id="email" type="email" placeholder="you@example.com"
+                        class="input-field w-full px-4 py-3 rounded-lg text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-2">Password</label>
+                    <input id="password" type="password" placeholder="Min. 6 characters"
+                        class="input-field w-full px-4 py-3 rounded-lg text-sm">
+                    <div class="mt-2 flex gap-1">
+                        <div id="s1" class="strength-bar flex-1 bg-neutral-800"></div>
+                        <div id="s2" class="strength-bar flex-1 bg-neutral-800"></div>
+                        <div id="s3" class="strength-bar flex-1 bg-neutral-800"></div>
+                    </div>
+                    <p id="strengthLabel" class="text-xs text-neutral-600 mt-1"></p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-2">Confirm Password</label>
+                    <input id="confirm" type="password" placeholder="Re-enter password"
+                        class="input-field w-full px-4 py-3 rounded-lg text-sm">
+                </div>
+
+                <button id="register-btn"
+                    class="btn-primary w-full py-3 rounded-lg text-sm mt-2">
+                    Create Account
+                </button>
+            </div>
+
+            <div class="flex items-center gap-4 my-6">
+                <div class="flex-1 border-t divider"></div>
+                <span class="text-xs text-neutral-600">OR</span>
+                <div class="flex-1 border-t divider"></div>
+            </div>
+
+            <p class="text-center text-sm text-neutral-500">
+                Already have an account?
+                <a href="/login" class="text-red-500 hover:text-red-400 font-medium ml-1">Sign in</a>
+            </p>
+
+        </div>
+    </main>
+
+   
+    <footer class="border-t border-neutral-900 px-6 py-4 text-center text-xs text-neutral-700">
+        © 2026 ChaiCode Cinema. All rights reserved.
+    </footer>
+
+  
+    <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/70 z-50">
+        <div id="modalBox" class="bg-neutral-900 border border-neutral-700 rounded-xl p-6 w-80 shadow-2xl">
+            <div class="flex items-center gap-3 mb-3">
+                <div id="modalIcon" class="w-8 h-8 rounded-full flex items-center justify-center"></div>
+                <h3 id="modalTitle" class="text-white font-semibold text-base"></h3>
+            </div>
+            <p id="modalText" class="text-neutral-400 text-sm mb-5"></p>
+            <button onclick="closeModal()" id="modalBtn"
+                class="w-full py-2.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-medium transition-colors">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <script>
+        if (localStorage.getItem('token')) window.location.href = '/';
+
+
+        document.getElementById('password').addEventListener('input', function() {
+            const v = this.value;
+            const s1 = document.getElementById('s1');
+            const s2 = document.getElementById('s2');
+            const s3 = document.getElementById('s3');
+            const label = document.getElementById('strengthLabel');
+
+            s1.style.background = '#2a2a2a';
+            s2.style.background = '#2a2a2a';
+            s3.style.background = '#2a2a2a';
+
+            if (v.length === 0) { label.textContent = ''; return; }
+            if (v.length < 6) {
+                s1.style.background = '#e11d48'; label.textContent = 'Weak'; label.style.color = '#e11d48';
+            } else if (v.length < 10) {
+                s1.style.background = '#f97316'; s2.style.background = '#f97316';
+                label.textContent = 'Fair'; label.style.color = '#f97316';
+            } else {
+                s1.style.background = '#22c55e'; s2.style.background = '#22c55e'; s3.style.background = '#22c55e';
+                label.textContent = 'Strong'; label.style.color = '#22c55e';
+            }
+        });
+
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalText = document.getElementById('modalText');
+        const modalIcon = document.getElementById('modalIcon');
+
+        function showModal(message, type = "error") {
+            modalText.textContent = message;
+            if (type === "success") {
+                modalTitle.textContent = "Success";
+                modalTitle.style.color = "#22c55e";
+                modalIcon.innerHTML = `<svg class="w-4 h-4" style="color:#22c55e" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
+                modalIcon.style.background = "rgba(34,197,94,0.1)";
+            } else {
+                modalTitle.textContent = "Error";
+                modalTitle.style.color = "#e11d48";
+                modalIcon.innerHTML = `<svg class="w-4 h-4" style="color:#e11d48" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`;
+                modalIcon.style.background = "rgba(225,29,72,0.1)";
+            }
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+        }
+
+        function closeModal() {
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+
+        document.getElementById('register-btn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm').value;
+
+            if (!email || !password || !confirm) return showModal("Please fill in all fields.");
+            if (password !== confirm) return showModal("Passwords do not match.");
+            if (password.length < 6) return showModal("Password must be at least 6 characters.");
+
+            try {
+                const res = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                let data;
+                try { data = await res.json(); } catch { throw new Error("Invalid server response"); }
+
+                if (!res.ok) throw new Error(data.message || data.error || "Registration failed");
+
+                showModal("Account created! Redirecting to login...", "success");
+                setTimeout(() => { window.location.href = '/login'; }, 1200);
+
+            } catch (err) {
+                showModal(err.message || "Something went wrong");
+            }
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('register-btn').click();
+        });
+    </script>
+</body>
+</html>

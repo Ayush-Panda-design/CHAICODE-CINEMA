@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login – ChaiCode Cinema</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { font-family: 'DM Sans', sans-serif; }
+
+        body {
+            background-color: #050505;
+            overflow: hidden;
+            color: #e5e5e5;
+        }
+
+  
+        .cinema-strip {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            display: flex;
+            gap: 20px;
+            transform: translateY(-50%);
+            animation: scrollX 45s linear infinite;
+            opacity: 0.12;
+            z-index: 0;
+          
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+        }
+
+        .cinema-strip img {
+            width: 180px;
+            height: 270px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes scrollX {
+            0% { transform: translateX(0) translateY(-50%); }
+            100% { transform: translateX(-50%) translateY(-50%); }
+        }
+
+   
+        .glass-card {
+            background: rgba(18, 18, 18, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+     
+        .input-field {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #e11d48;
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.15);
+        }
+
+        .btn-primary {
+            background: #e11d48;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #fb1d4d;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px -5px rgba(225, 29, 72, 0.4);
+        }
+
+        .btn-primary:active { transform: translateY(0); }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+<div class="fixed inset-0 overflow-hidden -z-10">
+    <div class="cinema-strip">
+        <img src="https://image.tmdb.org/t/p/w300/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg" alt="Poster">
+        <img src="https://image.tmdb.org/t/p/w300/6DrHO1jr3qVrViUO6s6kFiAGM7.jpg" alt="Poster">
+        <img src="https://image.tmdb.org/t/p/w300/5KCVkau1HEl7ZzfPsKAPM0sMiKc.jpg" alt="Poster">
+        <img src="https://image.tmdb.org/t/p/w300/1E5baAaEse26fej7uHcjOgEE2t2.jpg" alt="Poster">
+        <img src="https://image.tmdb.org/t/p/w300/9Gtg2DzBhmYamXBS1hKAhiwbBKS.jpg" alt="Poster">
+        <img src="https://image.tmdb.org/t/p/w300/q719jXXLsVp68uU4pSbiH6N7JvG.jpg" alt="Poster">
+        <img src="https://image.tmdb.org/t/p/w300/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg" alt="Poster">
+        <img src="https://image.tmdb.org/t/p/w300/6DrHO1jr3qVrViUO6s6kFiAGM7.jpg" alt="Poster">
+        
+        <img src="https://image.tmdb.org/t/p/w300/1E5baAaEse26fej7uHcjOgEE2t2.jpg" alt="Poster">
+    </div>
+</div>
+
+<header class="relative z-10 border-b border-white/5 px-8 py-5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-red-600 flex items-center justify-center shadow-lg shadow-red-900/20">🎬</div>
+        <span class="font-bold text-white text-xl tracking-tight">
+            ChaiCode <span class="text-red-500">Cinema</span>
+        </span>
+    </div>
+    <a href="/register" class="text-sm font-medium text-neutral-400 hover:text-white transition-colors">
+        New user? <span class="text-white">Register →</span>
+    </a>
+</header>
+
+<main class="relative z-10 flex-1 flex items-center justify-center px-4">
+    <div class="w-full max-w-[420px] glass-card p-10 rounded-2xl">
+        
+        <div class="mb-10 text-center">
+            <h1 class="text-3xl font-bold text-white tracking-tight">Sign in</h1>
+            <p class="text-neutral-400 text-sm mt-2">Welcome back. Let's get you seated.</p>
+        </div>
+
+        <div class="space-y-6">
+            <div class="group">
+                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest ml-1">Email Address</label>
+                <input type="email" id="email" placeholder="name@example.com"
+                    class="input-field w-full px-4 py-3.5 rounded-xl text-sm mt-1.5">
+            </div>
+
+            <div class="relative group">
+                <div class="flex justify-between items-center ml-1">
+                    <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Password</label>
+                    <a href="#" class="text-[10px] font-bold text-red-500 uppercase tracking-widest hover:text-red-400 transition-colors">Forgot?</a>
+                </div>
+                <input type="password" id="password" placeholder="••••••••"
+                    class="input-field w-full px-4 py-3.5 rounded-xl text-sm mt-1.5">
+            </div>
+
+            <button id="loginBtn"
+                class="btn-primary w-full py-4 rounded-xl text-sm tracking-wide mt-2">
+                Sign In
+            </button>
+        </div>
+
+        <div class="mt-8 flex items-center gap-4">
+            <div class="h-px bg-white/5 flex-1"></div>
+            <span class="text-[10px] font-bold text-neutral-600 uppercase">Secure Login</span>
+            <div class="h-px bg-white/5 flex-1"></div>
+        </div>
+
+        <p class="text-center text-sm text-neutral-500 mt-8">
+            Don't have an account? 
+            <a href="/register" class="text-white font-semibold hover:text-red-500 transition-colors">Register here</a>
+        </p>
+    </div>
+</main>
+
+<footer class="relative z-10 text-center px-6 py-8 border-t border-white/5 text-neutral-500 text-sm">
+    
+    <p class="italic text-neutral-400">
+        “ChaiCode Cinema mein… aap sirf seat book nahi karte… aap ek kahani ka hissa ban jaate ho.”
+    </p>
+
+    <p class="text-[10px] mt-4 uppercase tracking-[0.3em] text-neutral-600">
+        © 2026 ChaiCode Cinema
+    </p>
+</footer>
+
+<div id="errorModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 backdrop-blur-sm">
+    <div class="bg-neutral-900 border border-white/10 rounded-2xl p-8 w-80 shadow-2xl">
+        <h3 class="text-white text-lg font-semibold mb-2">Login Failed</h3>
+        <p id="errorText" class="text-neutral-400 text-sm mb-6 leading-relaxed"></p>
+        <button onclick="closeModal()" class="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-medium transition-colors">
+            Try Again
+        </button>
+    </div>
+</div>
+
+
+
+<script>
+const modal = document.getElementById('errorModal');
+const errorText = document.getElementById('errorText');
+
+function showModal(msg) {
+    errorText.textContent = msg;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeModal() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    if(!email || !password) {
+        showModal("Please enter both email and password.");
+        return;
+    }
+
+    try {
+        const res = await fetch('/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            localStorage.setItem('token', data.data.token);
+            localStorage.setItem('user', JSON.stringify(data.data.user));
+            window.location.href = '/';
+        } else {
+            showModal(data.error || "Invalid credentials. Please check your details.");
+        }
+    } catch (err) {
+        showModal("Connection error. Please check your internet and try again.");
+    }
+});
+</script>
+
+</body>
+</html>
